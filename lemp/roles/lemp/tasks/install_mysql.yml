@@ -1,0 +1,12 @@
+- name: Install Mysql
+  vars: 
+   packages:
+   - mysql-server
+   - mysql-client
+
+  tasks:
+  - name: Install Mysql packages
+    yum:
+     name: "{{packages}}"
+     state: present
+    notify: start mysql 
