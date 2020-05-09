@@ -1,0 +1,29 @@
+---
+- hosts: all
+  tasks:
+  - name: get CpU usage
+    shell: "top -b -n 1"
+    register: top
+
+  - name: Set CPU usage
+    set_fact:
+      user_cpu: "{{top.stdout_lines[2].split()[1]}}"
+      system_cpu: "{{top.stdout_lines[2].split()[3]}}"
+
+  - name: Output Cpu Facts
+    debug:
+      msg:
+        - "User CPU Usage: {{user_cpu}}%"
+        - "System CPU Uage: {{system_cpu}}%"
+
+  - name: Generating an alarm
+    mail:
+      host: smtp.gmail.com
+      port: 587
+      username: aakashkapur29@gamil.com
+      password: nonu@383
+      to: aakashkapur29@gmail.com
+      subject: Ansible-Cpu-Report
+      body: System {{ansible_hostname}} has following CPU %
+             User CPU Usage = {{user_cpu}}%
+             System CPU Uage = {{system_cpu}}%

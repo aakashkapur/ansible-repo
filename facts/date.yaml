@@ -1,0 +1,22 @@
+---
+- hosts: all
+  tasks:
+    - name: Hostname
+      debug:
+        var=ansible_hostname
+
+    - name: Date and time of Playbook execution
+      vars:
+        msg: |
+          date: "{{ansible_date_time.date}}"
+          time: "{{ansible_date_time.time}}"
+      debug:
+        msg: "{{ msg.split('\n')}}"
+
+    - name: Network Information
+      vars:
+        msg: |
+          All_Interface_List: "{{ansible_interfaces}}"
+          All _ip: "{{ansible_all_ipv4_addresses}}"
+      debug:
+        msg: "{{msg.split('\n')}}"
