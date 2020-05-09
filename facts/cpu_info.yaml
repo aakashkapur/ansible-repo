@@ -21,7 +21,7 @@
       host: smtp.gmail.com
       port: 587
       username: aakashkapur29@gamil.com
-      password: nonu@383
+      password: *****
       to: aakashkapur29@gmail.com
       subject: Ansible-Cpu-Report
       body: System {{ansible_hostname}} has following CPU %
