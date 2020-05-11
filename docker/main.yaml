@@ -1,0 +1,34 @@
+---
+- name: Install {{package}} package and start using
+  gather_facts: false
+  become: yes
+  vars:
+    package:
+      - docker
+  hosts: all
+
+  tasks:
+    - name: Install {{package}} package
+      yum:
+        name: "{{package}}"
+        state: present
+
+    - name: Start {{package}} service
+      service:
+        name: docker
+        state: started
+
+    - name: Install docker dependency
+      pip:
+        name: docker-py
+
+    - name: Start first docker container
+      docker_container:
+        name: my-apache-server
+        image: httpd
+        detach: yes
+        published_ports: 5000:80
+        networks:
+          - name: mysubnet123
+            ipv4_address: 172.18.0.22
+            aliases: apache
