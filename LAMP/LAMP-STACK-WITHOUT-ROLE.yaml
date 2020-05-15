@@ -1,0 +1,114 @@
+---
+  - name: Deploy a Dynamic website using LAMP Stack
+    hosts: all
+    become: yes
+
+    tasks:
+    - name: Install
+      yum:
+        name: firewalld
+        state: present
+
+    - name: Enable and Start Firewalld
+      service:
+        name: firewalld
+        state: present
+        enabled: yes
+
+    - name: Deploy and configure database
+      yum:
+        name: mariadb-server
+        state: present
+
+    - name: Start database service
+      service:
+        name: mariadb
+        state: started
+        enabled: yes
+
+    - name: Configure firewall for database
+      firewalld:
+        port: 3306/tcp
+        zone: pulic
+        permanent: yes
+        immediate: yes
+        state: enabled
+
+    - name: Install epel release
+      yum:
+        name: epel-release
+        state: present
+
+    - name: Make sure pymysql is present
+      yum:
+        name: MYSQL-python
+        state: present
+
+    - name: Install python-pip
+      yum:
+        name: pyton-pip
+        state: present
+
+    - name: Make sure pymsql is present
+      pip:
+        name: MYSQL-python
+        state: latest
+
+    - name: Create a new database with name "ecommdb"
+      mysql_db:
+        name: ecomdb
+        state: present
+
+    - name: Create a a new user "ecomuser"
+      mysql_user:
+        host: localhost
+        name: ecomuser
+        password: password
+        priv: '*.*:ALL,GRANT'
+        state: present
+
+    - name: import ecom-table sql file
+      mysql_db:
+        state: import
+        name: ecomdb
+        target: /home/aakash/ansible/db-load-script.sql
+        ignore_errors: True
+
+    - name: Deploy and Configure web
+      yum:
+        name:
+        - httpd
+        - php
+        - php-mysql
+        - git
+      state: present
+
+    - name: Configure firewall for Apache
+      firewalld:
+        service: httpd
+        zone: public
+        permanent: yes
+        immediate: yes
+        state: present
+
+    - name: Start Web Services and Enable
+      service:
+        name: httpd
+        state: present
+        enabled: yes
+
+    - name: Clonning a got repo
+      git:
+        repo: 'https://github.com/kodekloudhub/learning-app-ecommerce.git'
+        dest: /var/www/html
+        ignore_errors: True
+
+    - name: Changing http configuation file
+      template:
+        src: /home/aakash/ansible/http.conf.j2
+        dest: /etc/httpd/conf/httpd.conf
+
+    - name: Changing Host in index.php
+      template:
+        src: /home/aakash/ansible/index.php.j2
+        dest: /var/www/html/index.html
