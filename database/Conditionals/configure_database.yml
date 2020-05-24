@@ -1,0 +1,20 @@
+  - name: Install packages
+    yum:
+      name: "{{ extra_packages }}"
+
+  - name: Update Configuation file
+    copy:
+      src: /home/devops/lab2-files/my.cnf
+      dest: "{{ configure_database_path }}"
+      owner: mysql
+      group: mysql
+      mode: 0644
+      seuser: system_u
+      setype: mysqld_etc_t
+      force: yes
+
+  - name: Start DB services
+    service:
+      name: "{{ db_service }}"
+      state: started
+      enabled: true
